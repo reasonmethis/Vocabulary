@@ -1,6 +1,6 @@
-Word-based algorithms unified in a menu-based text interface. Has two main components: preparation for VocabMeThis and a minimax engine for the Balda game.
+NLP project. Word-based algorithms unified in a text menu interface. Has two main components: preparation for VocabMeThis and a minimax engine for the Balda game.
 
-1. Training ground for the VocabMeThis web app, where I collect and build regular dictionaries and frequency dictionaries, and implement the measure and train vocabulary functionality as a simple console interface.
+1. Training ground for the VocabMeThis web app, where I collect and build regular dictionaries and frequency dictionaries, and implement the measure and train vocabulary functionality as a simple console interface. The most difficult and interesting NLP stuff happens in builddicts.py: crawling through Wiktionary to get word definitions (NLTK is missing many), weeding out derivative word forms with a custom lemmatization strategy (NLTK's built-in lemmatize function thinks that 'beses' is a form of 'be'), weeding out alternative spellings and nearly identical words like fantastical and fantastic through some heuristic stategies, ranking words by difficulty by using NLTK corpora to construct frequency dictionaries, linking words that are ex
 
 2. Implementation of an engine for the Balda game, which has not (yet) made it into the VocabMeThis app. The engine uses a minimax algorithm with alpha-beta pruning, with some custom enhancements based on the specifics of the game. 
 
