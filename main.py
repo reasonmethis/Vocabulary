@@ -48,7 +48,7 @@ def build_possiblewords(wrd, words):
     return res
 
 
-def get_score(cur_state, goal_stop):
+def get_score(cur_state: Baldastate, goal_stop):
     verbose = 0
     if verbose:
         print(
@@ -111,7 +111,7 @@ def get_score(cur_state, goal_stop):
     return best_score, best_new_state
 
 
-def compare_scores(score, best_score, goal_stop, state):
+def compare_scores(score, best_score, goal_stop, state: Baldastate):
     if state.firstplayersturn:
         if score > best_score:
             # if flag == 1: input('oops')
@@ -123,11 +123,14 @@ def compare_scores(score, best_score, goal_stop, state):
     return best_score, 0
 
 
-def get_next(state):
+def get_next(state: Baldastate):
+    '''Returns a pair: list of next possible Baldastate-s (one per possible next letter, each
+    storing a full list of possible words compatible with it) AND leaf score if the state is terminal
+    (word completed)'''
     if state.is_word():
         return None, state.leafscore()
     sz = len(state.wrd)
-    letters = {}  # new possible states
+    letters: dict[str, Baldastate]= {}  # new possible states
     for wrd in state.possiblewords:
         if (lt := wrd[sz]) in letters:
             letters[lt].possiblewords.append(wrd)
