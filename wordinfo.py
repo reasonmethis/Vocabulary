@@ -74,9 +74,7 @@ def meanings(wrd, strictmatch=True, include_lemmanames=True):
             if not strictmatch or wrd in x.lemma_names()
         ]
     else:
-        return posdef + [
-            x.definition() for x in syns if not strictmatch or wrd in x.lemma_names()
-        ]
+        return posdef + [x.definition() for x in syns if not strictmatch or wrd in x.lemma_names()]
 
 
 def formatted_meanings(wrd, strictmatch=True):

@@ -18,6 +18,7 @@ fn_freqdictgood = 'freq dict good.txt'
 # fn_lemmatize = 'lemmatizations.txt'
 # fn_wik = "wiktionary.txt"
 
+
 class Baldastate:
     def __init__(self, wrd, fpturn, words, bestseq=None):
         self.wrd = wrd
@@ -130,7 +131,7 @@ def get_next(state: Baldastate):
     if state.is_word():
         return None, state.leafscore()
     sz = len(state.wrd)
-    letters: dict[str, Baldastate]= {}  # new possible states
+    letters: dict[str, Baldastate] = {}  # new possible states
     for wrd in state.possiblewords:
         if (lt := wrd[sz]) in letters:
             letters[lt].possiblewords.append(wrd)
@@ -157,9 +158,7 @@ def play_balda(allwords, compfirst=False, initwrd=""):
         plrturn = not plrturn
         if plrturn:
             if wrd:
-                c = input(
-                    'Add one letter (or "quit" to quit): '.ljust(msgssz) + wrd + '... '
-                )
+                c = input('Add one letter (or "quit" to quit): '.ljust(msgssz) + wrd + '... ')
             else:
                 c = input('Enter the first letter (or "quit" to quit): '.ljust(msgssz))
 
@@ -190,9 +189,7 @@ def play_balda(allwords, compfirst=False, initwrd=""):
 				continue
 			if c == '?':"""
                 posswords = build_possiblewords(wrd, allwords)
-                print(
-                    'Possible words: ' + ', '.join(posswords[: min(10, len(posswords))])
-                )
+                print('Possible words: ' + ', '.join(posswords[: min(10, len(posswords))]))
                 print('I win!\n')
                 return 'compwins'
             if c.startswith('?'):
@@ -242,9 +239,7 @@ def play_balda(allwords, compfirst=False, initwrd=""):
                     print("Meanings of", wrd + ':')
                     print(mns)
                 else:
-                    print(
-                        "I don't know what it means but I know it's in the Scrabble dictionary."
-                    )
+                    print("I don't know what it means but I know it's in the Scrabble dictionary.")
                 print()
                 return 'compwins'
             else:
@@ -273,9 +268,7 @@ def play_balda(allwords, compfirst=False, initwrd=""):
                     print('There is no such word in the Scrabble dictionary.')
             print()
             return ''
-        wrd = (
-            nxt.wrd if len(nxt.wrd) > 1 else random.choice('abcdefghijklmnopqrstuvwxyz')
-        )
+        wrd = nxt.wrd if len(nxt.wrd) > 1 else random.choice('abcdefghijklmnopqrstuvwxyz')
         if len(wrd) == 1:
             print("I'll go with the letter:".ljust(msgssz), end='')
         else:
@@ -297,17 +290,17 @@ def get_difs(int_l):
 
 def load_lemmatize_d(fn):
     lines = load_lines(fn)
-    resD = {}
+    res_d = {}
     for st in lines:
         st2 = st.split(': ')
         st3 = st2[1].split('; ')
-        posD = {}
+        pos_d = {}
         for posentry in st3:
             tmp = posentry.split('. ')
             lemmas = set(tmp[1].split(', ')) if posentry else set()
-            posD[tmp[0]] = lemmas
-        resD[st2[0]] = posD
-    return resD
+            pos_d[tmp[0]] = lemmas
+        res_d[st2[0]] = pos_d
+    return res_d
 
 
 def group_beg(wrdi):  # first index with the same frequency
@@ -378,9 +371,7 @@ def test_vocab():
     print("-" * 100)
     while True:
         dvar_l = []
-        tries_per_buk1, score_per_buk1 = modify_heuristicly(
-            tries_per_buk, score_per_buk
-        )
+        tries_per_buk1, score_per_buk1 = modify_heuristicly(tries_per_buk, score_per_buk)
         vocab_estimate, var_cumul = calc_vocab(tries_per_buk1, score_per_buk1)
         # vocab_estimate, var_cumul = calc_vocab(tries_per_buk, score_per_buk)
         if user_voc_est != -1:
@@ -391,15 +382,11 @@ def test_vocab():
             prob = (score_per_buk1[i] + 0.5) / n_eff
 
             tries_per_buk[i] += 1
-            tries_per_buk2, score_per_buk2 = modify_heuristicly(
-                tries_per_buk, score_per_buk, i, 0
-            )
+            tries_per_buk2, score_per_buk2 = modify_heuristicly(tries_per_buk, score_per_buk, i, 0)
             _, var_cumul0 = calc_vocab(tries_per_buk2, score_per_buk2)
 
             score_per_buk[i] += 1
-            tries_per_buk2, score_per_buk2 = modify_heuristicly(
-                tries_per_buk, score_per_buk, i, 1
-            )
+            tries_per_buk2, score_per_buk2 = modify_heuristicly(tries_per_buk, score_per_buk, i, 1)
             _, var_cumul1 = calc_vocab(tries_per_buk2, score_per_buk2)
 
             tries_per_buk[i] -= 1
@@ -411,9 +398,7 @@ def test_vocab():
             else:
                 dvar_l.append(0)
 
-        print(
-            f"\nYOUR VOCABULARY: {int(vocab_estimate + 0.5)} ± {int(var_cumul ** 0.5 + 0.5)}."
-        )
+        print(f"\n_your VOCABULARY: {int(vocab_estimate + 0.5)} ± {int(var_cumul ** 0.5 + 0.5)}.")
         if verbose:
             print(score_per_buk)
             print(tries_per_buk)
@@ -455,7 +440,7 @@ def test_vocab():
         print(ans)
 
         if ans.startswith("q"):
-            print("\nThanks for playing!")
+            print("\n_thanks for playing!")
             return
 
         tries_per_buk[buk] += 1
@@ -473,17 +458,17 @@ def modify_heuristicly(tries_per_buk, score_per_buk, buk=None, y=None):
     # modify the scores using heuristic
     tries_per_buk2 = [0] * len(tries_per_buk)
     score_per_buk2 = [0] * len(score_per_buk)
-    addper1bukDiff = 20 / (n_b - 1)
+    addper1buk_diff = 20 / (n_b - 1)
     for i in range(n_b):
         nyes = score_per_buk[i]
         nno = tries_per_buk[i] - nyes
         for b in range(i):
-            toAdd = addper1bukDiff * (i - b) * nyes
-            tries_per_buk2[b] += toAdd
-            score_per_buk2[b] += toAdd
+            to_add = addper1buk_diff * (i - b) * nyes
+            tries_per_buk2[b] += to_add
+            score_per_buk2[b] += to_add
         for b in range(i + 1, n_b):
-            toAdd = addper1bukDiff * (b - i) * nno
-            tries_per_buk2[b] += toAdd
+            to_add = addper1buk_diff * (b - i) * nno
+            tries_per_buk2[b] += to_add
 
     for i in range(n_b):
         tries_per_buk2[i] += tries_per_buk[i]
@@ -503,8 +488,9 @@ def calc_vocab(tries_per_buk, score_per_buk):
 
     return vocab_estimate, var_cumul
 
-if __name__ =='__main__':
-    # buildFreqDic(fn_fr_d)
+
+if __name__ == '__main__':
+    # build_freq_dic(fn_fr_d)
     # build_dic(); exit()
     # build_balda_dic(); exit()
     # build_lemmatization_dic(fn_lemmatize); exit()
@@ -578,9 +564,7 @@ if __name__ =='__main__':
             allwords0 = [x[0] for x in fr_l if len(x[0]) >= baldaminwrdlen and x[1] <= 0]
             random.shuffle(allwords0)
             allwords += allwords0
-            nwbalda = wait_for_option(
-                {'1': neasy, '2': nmedium, '3': nhard, '4': tmp, '5': 0}
-            )
+            nwbalda = wait_for_option({'1': neasy, '2': nmedium, '3': nhard, '4': tmp, '5': 0})
 
             if not nwbalda:
                 while True:
@@ -621,7 +605,7 @@ if __name__ =='__main__':
                 compfirst = 1 - compfirst
             continue
 
-        '''print("\nSelect vocabulary list to use (recommended - 1):")
+        '''print("\n_select vocabulary list to use (recommended - 1):")
         print("1 - Normal words with definitions")
         print("2 - Normal words and proper names with definitions")
         print("3 - All words and expressions with definitions")
@@ -630,7 +614,7 @@ if __name__ =='__main__':
         fr_l, fr_d = load_freq_dic(fn_dic)
 
         n_tot = len(fr_l)
-        print('\nWords in current list:', n_tot)
+        print('\n_words in current list:', n_tot)
 
         user_voc_est = -1
         if playmode == 'improve':
@@ -651,4 +635,3 @@ if __name__ =='__main__':
         print(buk_n_l)
 
         test_vocab()
-

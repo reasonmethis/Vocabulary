@@ -13,9 +13,7 @@ from wordinfo import get_pos
 # pydic = PyDictionary()
 # print(pydic.meaning('my')); exit()
 def is_word(w):
-    return (
-        w in words and w[0].islower()
-    )  # excludes proper nouns but for example July is
+    return w in words and w[0].islower()  # excludes proper nouns but for example July is
     # technically one
 
 
@@ -104,7 +102,7 @@ def gen_freq_dic(fr_d, corpora):
     return fr_l
 
 
-def buildFreqDic(fn):
+def build_freq_dic(fn):
     corpora = [
         nltk.corpus.brown,
         nltk.corpus.gutenberg,
@@ -188,11 +186,11 @@ def build_dic():
     print("Done.")
 
 
-def build_balda_dic():  # posL=None):
+def build_balda_dic():  # pos_l=None):
     print("Building Balda dictionary...")
-    posL = None
+    pos_l = None
     """
-	print("Building Balda dictionary with parts of speech:", posL)
+	print("Building Balda dictionary with parts of speech:", pos_l)
 	synsets_in_wordnet = wordnet.all_synsets()
 	letters = set('abcdefghijklmnopqrstuvwxyz')
 	n = 117658
@@ -205,7 +203,7 @@ def build_balda_dic():  # posL=None):
 			print(f"{frac}% done.")
 			frac += 10
 
-		if posL and s.pos() not in posL: 
+		if pos_l and s.pos() not in pos_l: 
 			continue 
 
 		for wrd in s.lemma_names():
@@ -235,7 +233,7 @@ def build_balda_dic():  # posL=None):
         if w in lowercase_d:
                 res_d[w] = lowercase_d[w]
         else:
-                if not posL:
+                if not pos_l:
                         res_d[w] = -1 #scr
         """
         try:
@@ -243,7 +241,7 @@ def build_balda_dic():  # posL=None):
         except:
             res_d[w] = 0
     print("Saving dictionary...")
-    fn_balda = makefn_balda(posL)
+    fn_balda = makefn_balda(pos_l)
     save_fr_d(fn_balda, res_d)
 
 
@@ -322,16 +320,12 @@ def build_lemmatization_dic(fn):
         i += 1
         if not i % 1000:
             print(i)
-        lemD = my_lemmatize_fromscratch(wrd)
-        res_l.append((wrd, lemD))
+        lem_d = my_lemmatize_fromscratch(wrd)
+        res_l.append((wrd, lem_d))
     with open(fn, 'w') as f:
         for r in res_l:
             lemstr = '; '.join(
-                [
-                    f"{pos}. {', '.join(lemset)}"
-                    for pos, lemset in r[1].items()
-                    if lemset
-                ]
+                [f"{pos}. {', '.join(lemset)}" for pos, lemset in r[1].items() if lemset]
             )
             f.write(f"{r[0]}: {lemstr}\n")
             # input(f"{r[0]}: {lemstr}\n")
@@ -364,12 +358,8 @@ def scrapewiktionary(fn_save, fn_wordlist=None):
 
     if fn_wordlist:
         # fr_l = load_lines(fn_wordlist)
-        with open(
-            fn_wordlist, 'r'
-        ) as f:  # any encoding is fine, cuz only ascii is used by dflt
-            fr_l = json.load(
-                f
-            )  # but this can now contain unicode chars like 'zēlotypia'
+        with open(fn_wordlist, 'r') as f:  # any encoding is fine, cuz only ascii is used by dflt
+            fr_l = json.load(f)  # but this can now contain unicode chars like 'zēlotypia'
     else:
         fr_l, fr_d = load_freq_dic(fn_balda)
         fr_l = [x[0] for x in fr_l]
@@ -440,29 +430,29 @@ def process_wikdict(fn, fnnew):
         cnt += 1
         if cnt % 1000 == 0:
             print(cnt)
-        sepsenseL = []
+        sepsense_l = []
         for sepsense_d in v:
             if "definitions" not in sepsense_d:
                 continue
-            posL = []
+            pos_l = []
             for pos in sepsense_d["definitions"]:
-                posS = pos["partOfSpeech"]
-                txtL = pos["text"]
-                wrdinfo = txtL[0]
-                posdefL = txtL[1:]
-                # posL.append((posS, wrdinfo, posdefL))
-                posL.append({'pos': posS, 'info': wrdinfo, 'defs': posdefL})
+                pos_s = pos["part_of_speech"]
+                txt_l = pos["text"]
+                wrdinfo = txt_l[0]
+                posdef_l = txt_l[1:]
+                # pos_l.append((pos_s, wrdinfo, posdef_l))
+                pos_l.append({'pos': pos_s, 'info': wrdinfo, 'defs': posdef_l})
 
-            if posL:
-                sepsenseL.append(posL)
+            if pos_l:
+                sepsense_l.append(pos_l)
 
-        if sepsenseL:
-            newdic[k] = sepsenseL
+        if sepsense_l:
+            newdic[k] = sepsense_l
 
-    newdicS = json.dumps(newdic)
-    # 	newdicS = json.dumps(newdic, indent=2)
+    newdic_s = json.dumps(newdic)
+    # 	newdic_s = json.dumps(newdic, indent=2)
     with open(fnnew, 'a') as f:
-        f.write(newdicS)
+        f.write(newdic_s)
     print(len(newdic), 'compact definitions saved.')
 
 
@@ -483,10 +473,10 @@ def narrow_wikdefs_to_lowercase_wordnet(fn, fnnew):
         if k in fr_d:
             newdic[k] = v
 
-    newdicS = json.dumps(newdic)
-    # 	newdicS = json.dumps(newdic, indent=2)
+    newdic_s = json.dumps(newdic)
+    # 	newdic_s = json.dumps(newdic, indent=2)
     with open(fnnew, 'a') as f:
-        f.write(newdicS)
+        f.write(newdic_s)
 
 
 def remove_nodef(fn_freqdict, fn_defs, fnnew):
@@ -494,32 +484,32 @@ def remove_nodef(fn_freqdict, fn_defs, fnnew):
     from the frequency dictionary that don't have definitions"""
     frl, frd = load_freq_dic(fn_freqdict)
     with open(fn_defs, 'r') as f:
-        defD = json.load(f)
-    frlnew = [x for x in frl if x[0] in defD and 'definitions' in defD[x[0]][0]]
+        def_d = json.load(f)
+    frlnew = [x for x in frl if x[0] in def_d and 'definitions' in def_d[x[0]][0]]
     save_as_str(fnnew, frlnew)
     print(len(frl), len(frlnew))
 
 
 def find_unhelpful_defs(fn_defs, fnnew, fn_tolookup):
     with open(fn_defs, 'r') as f:
-        defD = json.load(f)
-    betterformsD = {}
-    betterformsL = []
-    for w, defL in defD.items():
-        if len(defL) > 1:
+        def_d = json.load(f)
+    betterforms_d = {}
+    betterforms_l = []
+    for w, def_l in def_d.items():
+        if len(def_l) > 1:
             continue
-        posL = defL[0]
-        if len(posL) > 1:
+        pos_l = def_l[0]
+        if len(pos_l) > 1:
             continue
 
-        dfns = posL[0]['defs']
+        dfns = pos_l[0]['defs']
         if len(dfns) > 1:
             continue
         dfn = dfns[0]
         # Of or pertaining to
         # In a...Manner,  Like a , One who, That which , capable of being , degree of being, able to be,
         # The ability to be
-        soiL = [
+        soi_l = [
             'lural of ',
             've form of ',
             'participle of ',
@@ -529,7 +519,7 @@ def find_unhelpful_defs(fn_defs, fnnew, fn_tolookup):
             'bsolete form of ',
             'istoric form of ',
         ]
-        otherL = [
+        other_l = [
             'elating to ',
             ' tate of being ',
             'uality of being ',
@@ -538,40 +528,40 @@ def find_unhelpful_defs(fn_defs, fnnew, fn_tolookup):
         terminators = list(')(,;:[.') + ['See ', ' -']
 
         newwrd = dfn
-        for soi in soiL:
+        for soi in soi_l:
             if soi in newwrd:
                 newwrd = st_until(newwrd.split(soi)[1], terminators).strip()
 
         if newwrd != dfn and newwrd.count(' ') <= 1:
             # print(w, newwrd, ', def:', dfn)
-            betterformsD[w] = newwrd
-            if newwrd not in defD:
-                betterformsL.append(newwrd)
+            betterforms_d[w] = newwrd
+            if newwrd not in def_d:
+                betterforms_l.append(newwrd)
 
     with open(fnnew, 'w') as f:
-        json.dump(betterformsD, f)
+        json.dump(betterforms_d, f)
 
     with open(fn_tolookup, 'w') as f:
-        json.dump(betterformsL, f)
+        json.dump(betterforms_l, f)
 
     print(
         'Done.',
-        len(defD),
+        len(def_d),
         'total definitions examined.',
-        len(betterformsD),
+        len(betterforms_d),
         'better spellings found.',
-        len(betterformsL),
+        len(betterforms_l),
         'words to look up.',
     )
 
 
-def combine_jsondicts(fnMain, fnToAdd):
-    wd = json.loads(read_all(fnMain))
-    wdb = json.loads(read_all(fnToAdd))
+def combine_jsondicts(fn_main, fn_to_add):
+    wd = json.loads(read_all(fn_main))
+    wdb = json.loads(read_all(fn_to_add))
     print(len(wd), len(wdb))
     for k, v in wdb.items():
         wd[k] = v
-    with open(fnMain, 'w') as f:
+    with open(fn_main, 'w') as f:
         json.dump(wd, f)
     print(len(wd))
 
@@ -580,7 +570,7 @@ class def2refdata:
     # Of or pertaining to
     # In a...Manner,  Like a , One who, That which , capable of being , degree of being, able to be,
     # The ability to be
-    formOfL = [
+    form_of_l = [
         'Plural of ',
         'Indicative form of ',
         'Alternative form of ',
@@ -592,14 +582,14 @@ class def2refdata:
         'Obsolete form of ',
         'Historic form of ',
     ]
-    otherL = [
+    other_l = [
         'Synonym of ',
         'Relating to ',
         'State of being ',
         'Quality of being ',
         'Quality of not being ',
     ]
-    moreL = [
+    more_l = [
         '#Of or pertaining to ',
         '#Pertaining to ',
         '#Like ',
@@ -613,9 +603,9 @@ class def2refdata:
     ]
     # TODO: for "one who", "that which" there will be an extra 's' at the end
     # in a... Manner
-    # don't just check that the referenced word is in defD, check it's the right pos
-    soiL = formOfL + otherL + moreL
-    reftypeL = ['pl', 'tm', 'af', 'co', 'su', 'tm', 'sp', 'si', 'af', 'af'] + [
+    # don't just check that the referenced word is in def_d, check it's the right pos
+    soi_l = form_of_l + other_l + more_l
+    reftype_l = ['pl', 'tm', 'af', 'co', 'su', 'tm', 'sp', 'si', 'af', 'af'] + [
         'sy',
         're',
         'be',
@@ -686,18 +676,18 @@ class def2refdata:
 kstemmer = Stemmer()"""
 
 
-def def2ref(wrd, dfn, defD):
+def def2ref(wrd, dfn, def_d):
     d = def2refdata()
     # if wrd[0] > 's': return'',''
     orig = dfn
-    infoL = []
+    info_l = []
     dfn = dfn.strip()
     if dfn.startswith('(') and ')' in dfn:
-        dfn, infoL = process_init_brackets(dfn)
+        dfn, info_l = process_init_brackets(dfn)
 
     newwrd = dfn
     ref = ''
-    for soi, reftype in zip(d.soiL, d.reftypeL):
+    for soi, reftype in zip(d.soi_l, d.reftype_l):
         if soi[0] == '#':
             soi = soi[1:]
             atbeg = True
@@ -716,11 +706,9 @@ def def2ref(wrd, dfn, defD):
 			if soi== 've form of ':
 				print('---',wrd, 'newwrd:', newwrd, 'orig:',dfn)
 				input()"""
-    newwrd = st_cutbeg(
-        newwrd, ['A ', 'a ', 'The ', 'the ', 'An ', 'an ', 'To ', 'to ']
-    ).strip()
+    newwrd = st_cutbeg(newwrd, ['A ', 'a ', 'The ', 'the ', 'An ', 'an ', 'To ', 'to ']).strip()
 
-    if newwrd != dfn and newwrd in defD:
+    if newwrd != dfn and newwrd in def_d:
         ref = ref.upper()
         # print(wrd, 'newwrd:', newwrd, 'orig:',dfn); input()
 
@@ -728,32 +716,30 @@ def def2ref(wrd, dfn, defD):
         return ref, newwrd
     # check if the definition is pretty much just the same word, like fantastic and fantastical
     if not ref:
-        dfn = st_cutbeg(
-            dfn, ['A ', 'a ', 'The ', 'the ', 'An ', 'an ', 'To ', 'to ']
-        ).strip()
+        dfn = st_cutbeg(dfn, ['A ', 'a ', 'The ', 'the ', 'An ', 'an ', 'To ', 'to ']).strip()
         dfn = dfn.strip(' \n\t\r.,;')
-        if dfn and dfn[0].isupper():  # and dfn not in defD:
+        if dfn and dfn[0].isupper():  # and dfn not in def_d:
             dfnl = dfn.lower()
-            if dfnl in defD:
+            if dfnl in def_d:
                 # TODO: permanently decap
                 # print('decapitalyzing', dfn, dfnl);# input()
                 dfn = dfnl
 
-        dfnInD = dfn in defD
-        if not dfnInD:
+        dfn_in_d = dfn in def_d
+        if not dfn_in_d:
             return '', ''
 
-        if {'British spelling'} & set(infoL):
+        if {'British spelling'} & set(info_l):
             return 'SP', dfn
-        if {'obsolete', 'archaic', 'dated'} & set(infoL):
+        if {'obsolete', 'archaic', 'dated'} & set(info_l):
             return 'OL', dfn
-        if {'dialect'} & set(infoL):
+        if {'dialect'} & set(info_l):
             return 'DI', dfn
-        if {'informal', 'colloquial'} & set(infoL):
+        if {'informal', 'colloquial'} & set(info_l):
             return 'IN', dfn
-        if {'slang'} & set(infoL):
+        if {'slang'} & set(info_l):
             return 'SL', dfn
-        if {'nonstandard'} & set(infoL):
+        if {'nonstandard'} & set(info_l):
             return 'NS', dfn
 
         # ws = set(wrd)
@@ -774,12 +760,7 @@ def def2ref(wrd, dfn, defD):
             mm = 1
         if eddist < min(5, 0.25 * maxlen):
             m = 1
-        if (
-            eddist < 4
-            and ' ' not in dfn
-            and min(len(wrd), len(dfn)) >= 6
-            and wrd[:6] == dfn[:6]
-        ):
+        if eddist < 4 and ' ' not in dfn and min(len(wrd), len(dfn)) >= 6 and wrd[:6] == dfn[:6]:
             m = 1
         # if dfn and len(notincommon) < 4:#ordered set?
         ref = 'SI' if m else 'SY'
@@ -811,63 +792,61 @@ def build_wikdefs_withrefs(fn_defs, fnnew):
     entry should be ('',''))
     """
     with open(fn_defs, 'r') as f:
-        defD = json.load(f)
-    tolookupL = []
-    betterformsL = []
+        def_d = json.load(f)
+    tolookup_l = []
+    betterforms_l = []
     cnt = 0
-    for w, sepsenseL in defD.items():
+    for w, sepsense_l in def_d.items():
         cnt += 1
         if cnt % 1000 == 0:
             print(cnt)
         nodefs = True
         norefs = True
-        for posL in sepsenseL:
-            for pos in posL:
+        for pos_l in sepsense_l:
+            for pos in pos_l:
                 if 'defs' not in pos:
                     continue
                 dfns = pos['defs']
-                refL = []
+                ref_l = []
                 for dfn in dfns:
                     nodefs = False
-                    ref, newwrd = def2ref(w, dfn, defD)
-                    refL.append([ref, newwrd])
+                    ref, newwrd = def2ref(w, dfn, def_d)
+                    ref_l.append([ref, newwrd])
                     if not ref:
                         continue
 
                     norefs = False
-                    if newwrd not in defD:
-                        tolookupL.append(newwrd)  # to look up later
+                    if newwrd not in def_d:
+                        tolookup_l.append(newwrd)  # to look up later
                         # print(newwrd)#; input()
-                    betterformsL.append([w, ref, newwrd])
+                    betterforms_l.append([w, ref, newwrd])
 
                 # add 'refs' field
                 if not norefs:
-                    pos['refs'] = refL
+                    pos['refs'] = ref_l
                     import random
 
                     if (
-                        pos['refs']
-                        and pos['refs'][0][0] != 'PL'
-                        and random.random() < -0.001
+                        pos['refs'] and pos['refs'][0][0] != 'PL' and random.random() < -0.001
                     ):  # and wrd
                         print(pos)
                         input()
 
     with open(fnnew, 'w') as f:
-        json.dump(defD, f)
+        json.dump(def_d, f)
 
     fn_tolookup = 'to look up.txt'
     with open(fn_tolookup, 'w') as f:
-        json.dump(tolookupL, f)
-        # json.dump(betterformsL, f)
+        json.dump(tolookup_l, f)
+        # json.dump(betterforms_l, f)
 
     print(
         'Done.',
-        len(defD),
+        len(def_d),
         'total definitions examined.',
-        len(betterformsL),
+        len(betterforms_l),
         'references found.',
-        len(tolookupL),
+        len(tolookup_l),
         'words to look up.',
     )
 
@@ -887,9 +866,9 @@ def st_cutbeg(dfn, begs):
     return dfn
 
 
-def st_cutends(wrd, dfn, endspairsL):
+def st_cutends(wrd, dfn, endspairs_l):
     wrdlonger = len(wrd) - len(dfn)
-    for e, ee in endspairsL:
+    for e, ee in endspairs_l:
         elonger = len(e) - len(ee)
         if wrdlonger * elonger < 0:
             continue
@@ -904,23 +883,23 @@ def st_cutends(wrd, dfn, endspairsL):
 def process_init_brackets(w):
     wspl = w.split(')')
     wrd = wspl[1].strip()
-    infoL = [x.strip() for x in wspl[0][1:].split(',')]
-    return wrd, infoL
+    info_l = [x.strip() for x in wspl[0][1:].split(',')]
+    return wrd, info_l
 
 
 def build_good_wikdefs(fn_withrefs, fnnew, fnwordlist):
     d = def2refdata()
-    defD = json.loads(read_all(fn_withrefs))
+    def_d = json.loads(read_all(fn_withrefs))
     cnt = 0
-    newD = {}
-    wL = []
-    for w, sepsenseL in defD.items():
+    new_d = {}
+    w_l = []
+    for w, sepsense_l in def_d.items():
         cnt += 1
         good = False
         if cnt % 1000 == 0:
             print(cnt)
-        for posL in sepsenseL:
-            for pos in posL:
+        for pos_l in sepsense_l:
+            for pos in pos_l:
                 if 'defs' not in pos:
                     continue
                 if pos['pos'].lower() == 'proper noun':
@@ -939,14 +918,14 @@ def build_good_wikdefs(fn_withrefs, fnnew, fnwordlist):
             if good:
                 break
         if good:
-            newD[w] = sepsenseL
-            wL.append(w)
+            new_d[w] = sepsense_l
+            w_l.append(w)
 
     with open(fnnew, 'w') as f:
-        json.dump(newD, f)
+        json.dump(new_d, f)
     with open(fnwordlist, 'w') as f:
-        json.dump(wL, f)
-    print(len(wL))
+        json.dump(w_l, f)
+    print(len(w_l))
 
 
 from vocabutils import check_default_file_encoding
@@ -964,9 +943,7 @@ fn_lemmatize = 'lemmatizations.txt'
 fn_wik = "wiktionary.txt"
 fn_wikdefs = "wiktionary definitions.txt"
 fn_wikdefslower = "wiktionary definitions for lowercase wordnet.txt"
-fn_lowercase_withwikdefs = (
-    "all lowercase words with Wordnet definitions and Wik definitions.txt"
-)
+fn_lowercase_withwikdefs = "all lowercase words with Wordnet definitions and Wik definitions.txt"
 fn_betterforms = "better spellings of words.txt"
 fn_tolookup = "better spellings list to look up.txt"
 fn_wik_betterspellings = 'wik better spellings.txt'
@@ -992,7 +969,7 @@ exit()
 words = set(nltk.corpus.words.words())
 lemmer = nltk.stem.WordNetLemmatizer()
 
-# buildFreqDic(fn_fr_d)
+# build_freq_dic(fn_fr_d)
 # build_dic(); exit()
 # build_balda_dic(); exit()
 # build_lemmatization_dic(fn_lemmatize); exit()

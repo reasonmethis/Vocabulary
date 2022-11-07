@@ -68,7 +68,7 @@ def wait_for_option(key_d, keypress_detection_mode=True):
             k = k.decode('utf-8')
             if k in key_d:
                 return key_d[k]
-    
+
     while True:
         k = input('Enter your selection: ')
         if k in key_d:
